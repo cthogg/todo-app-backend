@@ -6,9 +6,9 @@
 
 
 ## TODO:
-- POST to create a TODO
-- GET to retrieve a single TODO
-- GET to retreive all TODOss
-- PUT to edit a TODO
-- DELETE to remove a TODO
-- Basic Tests
+- POST to create a TODO-  Done
+- GET to retrieve a single TODO- Done
+- GET to retreive all TODOs - Done
+- PUT to edit a TODO - Done
+- DELETE to remove a TODO - Done
+- Basic Tests - Done
