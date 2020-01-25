@@ -12,10 +12,14 @@ let todos = {
   1: {
     id: '1',
     description: 'John Lennon',
+    title: 'Me',
+    dueDate: '2020-01-01'
   },
   2: {
     id: '2',
     description: 'Dave Davids',
+    title: 'You',
+    dueDate: '1990-01-01'
   },
 };
 
@@ -32,11 +36,12 @@ app.get('/todos/:todoId', (req, res) => {
 
 //TODO: check for 201 
 app.post('/todos', (req, res) => {
-  const id = uuidv4();
-  const description = req.body.description;
+  const {description,title, dueDate, id} = req.body;
   const message = {
     id,
-    description
+    description,
+    title,
+    dueDate
   };
       //TODO: return error or no description or title
 
@@ -45,10 +50,12 @@ app.post('/todos', (req, res) => {
 });
 app.put('/todos/:todoId', (req, res) => {
   const todoId = req.params.todoId
-  const description = req.body.description;
+  const {description,title, dueDate} = req.body;
   const message = {
     id: todoId,
-    description
+    description,
+    title,
+    dueDate
   };
   //TODO: return error or no description or title
   todos[todoId] = message
@@ -75,12 +82,15 @@ request(app)
   .end(function(err, res) {
     if (err) throw err;
   });
-  request(app)
+/*   request(app)
   .post('/todos')
-  .send({description: 'john'})
+  .send({id: '99328',
+  description: 'John Lennon',
+  title: 'Me',
+  dueDate: '2020-01-01' })
   .set('Accept', 'application/json')
   .expect('Content-Type', /json/)
   .expect(200)
   .end(function(err, res) {
     if (err) throw err;
-  });
+  }); */
