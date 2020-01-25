@@ -3,9 +3,11 @@ const app = express();
 import cors from 'cors';
 import 'dotenv/config';
 import uuidv4 from 'uuid/v4';
+import request from 'supertest'
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+//TODO: add title as well
 let todos = {
   1: {
     id: '1',
@@ -50,3 +52,12 @@ app.delete('/todos/:todoId', (req, res) => {
 app.listen(process.env.PORT, () =>
   console.log(`Example app listening on port ${process.env.PORT}!`),
 );
+
+//TODO: move this test to separate module
+request(app)
+  .get('/todos')
+  .expect('Content-Type', /json/)
+  .expect(200)
+  .end(function(err, res) {
+    if (err) throw err;
+  });
