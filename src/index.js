@@ -82,6 +82,7 @@ request(app)
   .end(function(err, res) {
     if (err) throw err;
   });
+  //FIXME: remove this test
 /*   request(app)
   .post('/todos')
   .send({id: '99328',
