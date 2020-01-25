@@ -38,6 +38,8 @@ app.post('/todos', (req, res) => {
     id,
     description
   };
+      //TODO: return error or no description or title
+
   todos[id] = message;
   return res.send(message);
 });
@@ -48,6 +50,7 @@ app.put('/todos/:todoId', (req, res) => {
     id: todoId,
     description
   };
+  //TODO: return error or no description or title
   todos[todoId] = message
   return res.send(
    message
@@ -67,6 +70,15 @@ app.listen(process.env.PORT, () =>
 //TODO: move this test to separate module
 request(app)
   .get('/todos')
+  .expect('Content-Type', /json/)
+  .expect(200)
+  .end(function(err, res) {
+    if (err) throw err;
+  });
+  request(app)
+  .post('/todos')
+  .send({description: 'john'})
+  .set('Accept', 'application/json')
   .expect('Content-Type', /json/)
   .expect(200)
   .end(function(err, res) {
