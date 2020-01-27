@@ -6,7 +6,7 @@ import request from 'supertest'
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-//TODO: add title as well
+
 let todos = {
   1: {
     id: '1',
@@ -81,16 +81,3 @@ request(app)
   .end(function(err, res) {
     if (err) throw err;
   });
-  //FIXME: remove this test
-/*   request(app)
-  .post('/todos')
-  .send({id: '99328',
-  description: 'John Lennon',
-  title: 'Me',
-  dueDate: '2020-01-01' })
-  .set('Accept', 'application/json')
-  .expect('Content-Type', /json/)
-  .expect(200)
-  .end(function(err, res) {
-    if (err) throw err;
-  }); */
