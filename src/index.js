@@ -10,15 +10,25 @@ app.use(express.urlencoded({ extended: true }));
 let todos = {
   1: {
     id: '1',
-    description: 'John Lennon',
-    title: 'Me',
-    dueDate: '2020-01-01'
+    description: 'Semi Skimmed',
+    title: 'Buy Milk',
+    dueDate: '2020-01-20'
   },
   2: {
     id: '2',
-    description: 'Dave Davids',
-    title: 'You',
-    dueDate: '1990-01-01'
+    description: 'Ham and Cheese',
+    title: 'Buy Pizza',
+    dueDate: '2020-02-01'
+  }, 3: {
+    id: '3',
+    description: 'At the launderette',
+    title: 'Wash Clothes',
+    dueDate: '2020-02-02'
+  }, 4:{
+    id: '4',
+    description: 'Cleaning materials are in the cupboard',
+    title: 'Clean Apartment',
+    dueDate: '2020-02-02'
   },
 };
 
