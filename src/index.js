@@ -75,11 +75,20 @@ app.get('/', checkJwt, (req, res) => {
   res.send('Hello World!');
 });
 
+const binId = '5e396961f47af813bace8b68'
+const secretKey = '$2b$10$ss6kyK17Nzbft.WFD/o.fe55Krc14gVmKOcXk6RxppiAURM7UZ75m'
+
 app.get('/todos',checkJwt, (req, res) => {
+ //TODO: request latest version from api
   const userId = req.user.sub
-  axios.get('https://api.jsonbin.io/b/5e39680579afb813dc19a25c/1',{  headers: {'secret-key': '$2b$10$ss6kyK17Nzbft.WFD/o.fe55Krc14gVmKOcXk6RxppiAURM7UZ75m'},
-}).then(function (response) {
+  axios.get('https://api.jsonbin.io/e/5e396961f47af813bace8b68/versions',{  headers: {'secret-key': '$2b$10$ss6kyK17Nzbft.WFD/o.fe55Krc14gVmKOcXk6RxppiAURM7UZ75m'},
+}).then(function(response){
   console.log('response', response.data);
+  const versionNumber = response.data.versionCount
+  console.log('versionNumber', versionNumber);
+ return  axios.get(`https://api.jsonbin.io/b/5e396961f47af813bace8b68/${versionNumber}`,{  headers: {'secret-key': '$2b$10$ss6kyK17Nzbft.WFD/o.fe55Krc14gVmKOcXk6RxppiAURM7UZ75m'},
+})}).then(function (response) {
+  console.log('response data', response.data);
   return res.send(Object.values(response.data[userId]));
 }).catch(function (error) {
   console.log(error);
@@ -87,7 +96,7 @@ app.get('/todos',checkJwt, (req, res) => {
 });
 app.get('/todos/:todoId', checkJwt, (req, res) => {
   const userId = req.user.sub
-  axios.get('https://api.jsonbin.io/b/5e39680579afb813dc19a25c/1',{  headers: {'secret-key': '$2b$10$ss6kyK17Nzbft.WFD/o.fe55Krc14gVmKOcXk6RxppiAURM7UZ75m'},
+  axios.get('https://api.jsonbin.io/b/5e396961f47af813bace8b68/1',{  headers: {'secret-key': '$2b$10$ss6kyK17Nzbft.WFD/o.fe55Krc14gVmKOcXk6RxppiAURM7UZ75m'},
 })
   .then(function (response) {
     console.log('response', response.data);
@@ -100,6 +109,9 @@ app.get('/todos/:todoId', checkJwt, (req, res) => {
 
 //TODO: check for 201 
 app.post('/todos', checkJwt, (req, res) => {
+   //TODO: request latest version from api
+  //TODO: get from URL
+  //TODO: PUT the URL with new version
   const userId = req.user.sub
   const {description,title, dueDate, id} = req.body;
   const message = {
@@ -114,7 +126,11 @@ app.post('/todos', checkJwt, (req, res) => {
   return res.send(message);
 });
 app.put('/todos/:todoId',checkJwt, (req, res) => {
+   //TODO: request latest version from api
+
   //TODO: send out to the json bin.
+   //TODO: get from URL
+  //TODO: PUT the URL with new version
   const userId = req.user.sub
   const todoId = req.params.todoId
   const {description,title, dueDate} = req.body;
