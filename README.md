@@ -14,3 +14,4 @@
 - PUT to edit a TODO - Done
 - DELETE to remove a TODO - Done
 - Basic Tests - Done
+- A user can sign in to view their private TODOs.
