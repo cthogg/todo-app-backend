@@ -14,15 +14,10 @@ app.use(express.urlencoded({ extended: true }));
 
 // Set up Auth0 configuration
 const authConfig = {
+  //TODO: create new domain and audience
   domain: "dev-gzbfmeq4.eu.auth0.com",
   audience: "https://loggerman.com"
 };
-
-var colors = {
-  'auth0|5e395b0ed77aa50e4f1477e5': 'brown',
-  'google-oauth2|116227425365784020173': 'red',
-  'auth0|5e3962679c411f0e49a6b7aa': 'blue'
-}
 
 // Define middleware that validates incoming bearer tokens
 // using JWKS from dev-gzbfmeq4.eu.auth0.com
@@ -41,7 +36,7 @@ const checkJwt = jwt({
 
 
 let todos = {
-    //TODO: add user id here
+    //TODO: make these user Ids somehow secret
     "google-oauth2|116227425365784020173":{
 
   1: {
@@ -88,14 +83,18 @@ app.get('/todos',checkJwt, (req, res) => {
   console.log('userId', userId);
   return res.send(Object.values(todos[userId]));
 });
-app.get('/todos/:todoId', (req, res) => {
+app.get('/todos/:todoId', checkJwt, (req, res) => {
     //TODO: get the username from the request
   // TODO: get the todos from the username.
-  return res.send(todos[req.params.todoId]);
+  const userId = req.user.sub
+  console.log('userId put', userId);
+  return res.send(todos[userId][req.params.todoId]);
 });
 
 //TODO: check for 201 
 app.post('/todos', checkJwt, (req, res) => {
+  const userId = req.user.sub
+  console.log('userId put', userId);
   //TODO: get the username from the request
   // TODO: post the todos from the username.
   const {description,title, dueDate, id} = req.body;
@@ -107,10 +106,12 @@ app.post('/todos', checkJwt, (req, res) => {
   };
       //TODO: return error or no description or title
 
-  todos[id] = message;
+  todos[userId][id] = message;
   return res.send(message);
 });
-app.put('/todos/:todoId', (req, res) => {
+app.put('/todos/:todoId',checkJwt, (req, res) => {
+  const userId = req.user.sub
+  console.log('userId put', userId);
     //TODO: get the username from the request
   // TODO: PUT the todos from the username.
   const todoId = req.params.todoId
@@ -122,18 +123,20 @@ app.put('/todos/:todoId', (req, res) => {
     dueDate
   };
   //TODO: return error or no description or title
-  todos[todoId] = message
+  todos[userId][todoId] = message
   return res.send(
    message
   );
 });
 
-app.delete('/todos/:todoId', (req, res) => {
+app.delete('/todos/:todoId', checkJwt, (req, res) => {
         //TODO: get the username from the request
   // TODO: delete the todos from the username.
+  const userId = req.user.sub
+  console.log('userId delete', userId);
   const todoId = req.params.todoId
-  const todo = todos[todoId]
-  delete todos[todoId]
+  const todo = todos[userId][todoId]
+  delete todos[userId][todoId]
   return res.send(todo);
 });
 app.listen(process.env.PORT, () =>
