@@ -77,15 +77,21 @@ app.get('/', checkJwt, (req, res) => {
 
 app.get('/todos',checkJwt, (req, res) => {
   const userId = req.user.sub
-  return res.send(Object.values(todos[userId]));
+  axios.get('https://api.jsonbin.io/b/5e39680579afb813dc19a25c/1',{  headers: {'secret-key': '$2b$10$ss6kyK17Nzbft.WFD/o.fe55Krc14gVmKOcXk6RxppiAURM7UZ75m'},
+}).then(function (response) {
+  console.log('response', response.data);
+  return res.send(Object.values(response.data[userId]));
+}).catch(function (error) {
+  console.log(error);
+})  
 });
 app.get('/todos/:todoId', checkJwt, (req, res) => {
   const userId = req.user.sub
-  axios.get('https://api.jsonbin.io/b/5e39680579afb813dc19a25c',{  headers: {'secret-key': '$2b$10$ss6kyK17Nzbft.WFD/o.fe55Krc14gVmKOcXk6RxppiAURM7UZ75m'},
+  axios.get('https://api.jsonbin.io/b/5e39680579afb813dc19a25c/1',{  headers: {'secret-key': '$2b$10$ss6kyK17Nzbft.WFD/o.fe55Krc14gVmKOcXk6RxppiAURM7UZ75m'},
 })
   .then(function (response) {
     console.log('response', response.data);
-    res.send(todos[userId][req.params.todoId]);
+    res.send(response.data[userId][req.params.todoId]);
   })
   .catch(function (error) {
     console.log(error);
