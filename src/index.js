@@ -8,6 +8,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 let todos = {
+    //TODO: add user id here
+
   1: {
     id: '1',
     description: 'Semi Skimmed',
@@ -33,18 +35,25 @@ let todos = {
 };
 
 app.get('/', (req, res) => {
+
   res.send('Hello World!');
 });
 
 app.get('/todos', (req, res) => {
+     //TODO: get the username from the request
+  // TODO: get the todos from the username.
   return res.send(Object.values(todos));
 });
 app.get('/todos/:todoId', (req, res) => {
+    //TODO: get the username from the request
+  // TODO: get the todos from the username.
   return res.send(todos[req.params.todoId]);
 });
 
 //TODO: check for 201 
 app.post('/todos', (req, res) => {
+  //TODO: get the username from the request
+  // TODO: post the todos from the username.
   const {description,title, dueDate, id} = req.body;
   const message = {
     id,
@@ -58,6 +67,8 @@ app.post('/todos', (req, res) => {
   return res.send(message);
 });
 app.put('/todos/:todoId', (req, res) => {
+    //TODO: get the username from the request
+  // TODO: PUT the todos from the username.
   const todoId = req.params.todoId
   const {description,title, dueDate} = req.body;
   const message = {
@@ -74,6 +85,8 @@ app.put('/todos/:todoId', (req, res) => {
 });
 
 app.delete('/todos/:todoId', (req, res) => {
+        //TODO: get the username from the request
+  // TODO: delete the todos from the username.
   const todoId = req.params.todoId
   const todo = todos[todoId]
   delete todos[todoId]
