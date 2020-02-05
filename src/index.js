@@ -1,5 +1,8 @@
 import express from 'express';
 const app = express();
+const jwt = require("express-jwt");
+const jwksRsa = require("jwks-rsa");
+const axios = require('axios');
 import cors from 'cors';
 import 'dotenv/config';
 import request from 'supertest'
@@ -7,8 +10,39 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+
+
+// Set up Auth0 configuration
+const authConfig = {
+  domain: "dev-gzbfmeq4.eu.auth0.com",
+  audience: "https://loggerman.com"
+};
+
+var colors = {
+  'auth0|5e395b0ed77aa50e4f1477e5': 'brown',
+  'google-oauth2|116227425365784020173': 'red',
+  'auth0|5e3962679c411f0e49a6b7aa': 'blue'
+}
+
+// Define middleware that validates incoming bearer tokens
+// using JWKS from dev-gzbfmeq4.eu.auth0.com
+const checkJwt = jwt({
+  secret: jwksRsa.expressJwtSecret({
+    cache: true,
+    rateLimit: true,
+    jwksRequestsPerMinute: 5,
+    jwksUri: `https://${authConfig.domain}/.well-known/jwks.json`
+  }),
+
+  audience: authConfig.audience,
+  issuer: `https://${authConfig.domain}/`,
+  algorithm: ["RS256"]
+});
+
+
 let todos = {
     //TODO: add user id here
+    "google-oauth2|116227425365784020173":{
 
   1: {
     id: '1',
@@ -31,18 +65,28 @@ let todos = {
     description: 'Cleaning materials are in the cupboard',
     title: 'Clean Apartment',
     dueDate: '2020-02-02'
-  },
+  }},
+  "auth0|5e3962679c411f0e49a6b7aa":{
+    124:{
+      id: '124',
+      description: 'Cleaning materials are in the cupboard. Philip',
+      title: 'Clean Apartment',
+      dueDate: '2020-02-02'
+    }
+}
 };
 
-app.get('/', (req, res) => {
-
+app.get('/', checkJwt, (req, res) => {
   res.send('Hello World!');
 });
 
-app.get('/todos', (req, res) => {
+app.get('/todos',checkJwt, (req, res) => {
+  
      //TODO: get the username from the request
   // TODO: get the todos from the username.
-  return res.send(Object.values(todos));
+  const userId = req.user.sub
+  console.log('userId', userId);
+  return res.send(Object.values(todos[userId]));
 });
 app.get('/todos/:todoId', (req, res) => {
     //TODO: get the username from the request
@@ -51,7 +95,7 @@ app.get('/todos/:todoId', (req, res) => {
 });
 
 //TODO: check for 201 
-app.post('/todos', (req, res) => {
+app.post('/todos', checkJwt, (req, res) => {
   //TODO: get the username from the request
   // TODO: post the todos from the username.
   const {description,title, dueDate, id} = req.body;
@@ -97,10 +141,10 @@ app.listen(process.env.PORT, () =>
 );
 
 //TODO: move this test to separate module
-request(app)
+/* request(app)
   .get('/todos')
   .expect('Content-Type', /json/)
   .expect(200)
   .end(function(err, res) {
     if (err) throw err;
-  });
+  }); */
