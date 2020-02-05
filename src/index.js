@@ -76,27 +76,25 @@ app.get('/', checkJwt, (req, res) => {
 });
 
 app.get('/todos',checkJwt, (req, res) => {
-  
-     //TODO: get the username from the request
-  // TODO: get the todos from the username.
   const userId = req.user.sub
-  console.log('userId', userId);
   return res.send(Object.values(todos[userId]));
 });
 app.get('/todos/:todoId', checkJwt, (req, res) => {
-    //TODO: get the username from the request
-  // TODO: get the todos from the username.
   const userId = req.user.sub
-  console.log('userId put', userId);
-  return res.send(todos[userId][req.params.todoId]);
+  axios.get('https://api.jsonbin.io/b/5e39680579afb813dc19a25c',{  headers: {'secret-key': '$2b$10$ss6kyK17Nzbft.WFD/o.fe55Krc14gVmKOcXk6RxppiAURM7UZ75m'},
+})
+  .then(function (response) {
+    console.log('response', response.data);
+    res.send(todos[userId][req.params.todoId]);
+  })
+  .catch(function (error) {
+    console.log(error);
+  })  
 });
 
 //TODO: check for 201 
 app.post('/todos', checkJwt, (req, res) => {
   const userId = req.user.sub
-  console.log('userId put', userId);
-  //TODO: get the username from the request
-  // TODO: post the todos from the username.
   const {description,title, dueDate, id} = req.body;
   const message = {
     id,
@@ -110,10 +108,8 @@ app.post('/todos', checkJwt, (req, res) => {
   return res.send(message);
 });
 app.put('/todos/:todoId',checkJwt, (req, res) => {
+  //TODO: send out to the json bin.
   const userId = req.user.sub
-  console.log('userId put', userId);
-    //TODO: get the username from the request
-  // TODO: PUT the todos from the username.
   const todoId = req.params.todoId
   const {description,title, dueDate} = req.body;
   const message = {
@@ -130,10 +126,7 @@ app.put('/todos/:todoId',checkJwt, (req, res) => {
 });
 
 app.delete('/todos/:todoId', checkJwt, (req, res) => {
-        //TODO: get the username from the request
-  // TODO: delete the todos from the username.
   const userId = req.user.sub
-  console.log('userId delete', userId);
   const todoId = req.params.todoId
   const todo = todos[userId][todoId]
   delete todos[userId][todoId]
@@ -142,12 +135,3 @@ app.delete('/todos/:todoId', checkJwt, (req, res) => {
 app.listen(process.env.PORT, () =>
   console.log(`Example app listening on port ${process.env.PORT}!`),
 );
-
-//TODO: move this test to separate module
-/* request(app)
-  .get('/todos')
-  .expect('Content-Type', /json/)
-  .expect(200)
-  .end(function(err, res) {
-    if (err) throw err;
-  }); */
