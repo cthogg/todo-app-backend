@@ -5,7 +5,6 @@ const jwksRsa = require("jwks-rsa");
 const axios = require('axios');
 import cors from 'cors';
 import 'dotenv/config';
-import request from 'supertest'
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -34,43 +33,6 @@ const checkJwt = jwt({
   algorithm: ["RS256"]
 });
 
-
-let todos = {
-    //TODO: make these user Ids somehow secret
-    "google-oauth2|116227425365784020173":{
-
-  1: {
-    id: '1',
-    description: 'Semi Skimmed',
-    title: 'Buy Milk',
-    dueDate: '2020-01-20'
-  },
-  2: {
-    id: '2',
-    description: 'Ham and Cheese',
-    title: 'Buy Pizza',
-    dueDate: '2020-02-01'
-  }, 3: {
-    id: '3',
-    description: 'At the launderette',
-    title: 'Wash Clothes',
-    dueDate: '2020-02-02'
-  }, 4:{
-    id: '4',
-    description: 'Cleaning materials are in the cupboard',
-    title: 'Clean Apartment',
-    dueDate: '2020-02-02'
-  }},
-  "auth0|5e3962679c411f0e49a6b7aa":{
-    124:{
-      id: '124',
-      description: 'Cleaning materials are in the cupboard. Philip',
-      title: 'Clean Apartment',
-      dueDate: '2020-02-02'
-    }
-}
-};
-
 app.get('/', checkJwt, (req, res) => {
   res.send('Hello World!');
 });
@@ -94,18 +56,6 @@ app.get('/todos',checkJwt, (req, res) => {
 }).catch(function (error) {
   console.log(error);
 })  
-});
-app.get('/todos/:todoId', checkJwt, (req, res) => {
-  const userId = req.user.sub
-  axios.get('https://api.jsonbin.io/b/5e396961f47af813bace8b68/1',{  headers: {'secret-key': '$2b$10$ss6kyK17Nzbft.WFD/o.fe55Krc14gVmKOcXk6RxppiAURM7UZ75m'},
-})
-  .then(function (response) {
-    console.log('response', response.data);
-    res.send(response.data[userId][req.params.todoId]);
-  })
-  .catch(function (error) {
-    console.log(error);
-  })  
 });
 
 //TODO: check for 201 
@@ -155,11 +105,23 @@ app.put('/todos/:todoId',checkJwt, (req, res) => {
     title,
     dueDate
   };
+  getLatestData().then(function (response) {
+    var newTodos = response.data
+    newTodos[userId][todoId] = message
+    //TODO: put this data into new one
+    return   axios.put('https://api.jsonbin.io/b/5e396961f47af813bace8b68', newTodos, {  headers: {'secret-key': '$2b$10$ss6kyK17Nzbft.WFD/o.fe55Krc14gVmKOcXk6RxppiAURM7UZ75m'},
+  })
+  }).then(function(response){
+    return res.send(
+      message
+     );
+  }).catch(function (error) {
+    console.log(error);
+  })
+
+
   //TODO: return error or no description or title
-  todos[userId][todoId] = message
-  return res.send(
-   message
-  );
+  
 });
 
 app.delete('/todos/:todoId', checkJwt, (req, res) => {
