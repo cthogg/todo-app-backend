@@ -38,17 +38,16 @@ app.get('/', checkJwt, (req, res) => {
 });
 
 const binId = '5e396961f47af813bace8b68'
-const binRoute = `https://api.jsonbin.io/e/${binId}`
-//TODO: refactor all of the references to JS bin so it can be better handled
+const binRouteExperimental = `https://api.jsonbin.io/e/${binId}`
+const binRouteBase = `https://api.jsonbin.io/b/${binId}`
 //TODO: create a mock
 //TODO: add spinners to the application due to the slow load speeds. 
-const getLatestData = () =>  axios.get(`${binRoute}/versions`
+const getLatestData = () =>  axios.get(`${binRouteExperimental}/versions`
 ).then(function(response){
   const versionNumber = response.data.versionCount
- return  axios.get(`https://api.jsonbin.io/b/5e396961f47af813bace8b68/${versionNumber}`)})
+ return  axios.get(`${binRouteBase}/${versionNumber}`)})
 
 app.get('/todos',checkJwt, (req, res) => {
- //TODO: request latest version from api
   const userId = req.user.sub
   getLatestData().then(function (response) {
   return res.send(Object.values(response.data[userId]));
@@ -73,8 +72,7 @@ app.post('/todos', checkJwt, (req, res) => {
     var newTodos = response.data
     newTodos[userId][id] = message;    
     todo = newTodos[userId][todoId]
-    //TODO: put this data into new one
-    return   axios.put('https://api.jsonbin.io/b/5e396961f47af813bace8b68', newTodos)
+    return   axios.put(binRouteBase, newTodos)
   }).then(function(response){
     return res.send(todo);
   }).catch(function (error) {
@@ -83,12 +81,7 @@ app.post('/todos', checkJwt, (req, res) => {
 
 });
 app.put('/todos/:todoId',checkJwt, (req, res) => {
-   //TODO: request latest version from api
-
-  //TODO: send out to the json bin.
-   //TODO: get from URL
-  //TODO: PUT the URL with new version
-  const userId = req.user.sub
+    const userId = req.user.sub
   const todoId = req.params.todoId
   const {description,title, dueDate} = req.body;
   const message = {
@@ -100,8 +93,7 @@ app.put('/todos/:todoId',checkJwt, (req, res) => {
   getLatestData().then(function (response) {
     var newTodos = response.data
     newTodos[userId][todoId] = message
-    //TODO: put this data into new one
-    return   axios.put('https://api.jsonbin.io/b/5e396961f47af813bace8b68', newTodos)
+    return   axios.put(binRouteBase, newTodos)
   }).then(function(response){
     return res.send(
       message
@@ -109,9 +101,6 @@ app.put('/todos/:todoId',checkJwt, (req, res) => {
   }).catch(function (error) {
     console.log(error);
   })
-
-
-  //TODO: return error or no description or title
   
 });
 
@@ -123,8 +112,7 @@ app.delete('/todos/:todoId', checkJwt, (req, res) => {
     var newData = response.data
     todo = newData[userId][todoId]
     delete newData[userId][todoId]
-    //TODO: put this data into new one
-    return   axios.put('https://api.jsonbin.io/b/5e396961f47af813bace8b68', newData)
+    return   axios.put(binRouteBase, newData)
   }).then(function(response){
     return res.send(todo);
   }).catch(function (error) {
