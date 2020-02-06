@@ -78,16 +78,16 @@ app.get('/', checkJwt, (req, res) => {
 const binId = '5e396961f47af813bace8b68'
 const secretKey = '$2b$10$ss6kyK17Nzbft.WFD/o.fe55Krc14gVmKOcXk6RxppiAURM7UZ75m'
 
+const getLatestData = () =>  axios.get('https://api.jsonbin.io/e/5e396961f47af813bace8b68/versions',{  headers: {'secret-key': '$2b$10$ss6kyK17Nzbft.WFD/o.fe55Krc14gVmKOcXk6RxppiAURM7UZ75m'},
+}).then(function(response){
+  const versionNumber = response.data.versionCount
+ return  axios.get(`https://api.jsonbin.io/b/5e396961f47af813bace8b68/${versionNumber}`,{  headers: {'secret-key': '$2b$10$ss6kyK17Nzbft.WFD/o.fe55Krc14gVmKOcXk6RxppiAURM7UZ75m'},
+})})
+
 app.get('/todos',checkJwt, (req, res) => {
  //TODO: request latest version from api
   const userId = req.user.sub
-  axios.get('https://api.jsonbin.io/e/5e396961f47af813bace8b68/versions',{  headers: {'secret-key': '$2b$10$ss6kyK17Nzbft.WFD/o.fe55Krc14gVmKOcXk6RxppiAURM7UZ75m'},
-}).then(function(response){
-  console.log('response', response.data);
-  const versionNumber = response.data.versionCount
-  console.log('versionNumber', versionNumber);
- return  axios.get(`https://api.jsonbin.io/b/5e396961f47af813bace8b68/${versionNumber}`,{  headers: {'secret-key': '$2b$10$ss6kyK17Nzbft.WFD/o.fe55Krc14gVmKOcXk6RxppiAURM7UZ75m'},
-})}).then(function (response) {
+  getLatestData().then(function (response) {
   console.log('response data', response.data);
   return res.send(Object.values(response.data[userId]));
 }).catch(function (error) {
@@ -109,21 +109,20 @@ app.get('/todos/:todoId', checkJwt, (req, res) => {
 
 //TODO: check for 201 
 app.post('/todos', checkJwt, (req, res) => {
-   //TODO: request latest version from api
+   //TODO: request latest version from 
   //TODO: get from URL
-  //TODO: PUT the URL with new version
-  const userId = req.user.sub
+  //TODO: PUT the URL with new 
+    const userId = req.user.sub
+    var newTodos = response.data
   const {description,title, dueDate, id} = req.body;
   const message = {
     id,
     description,
     title,
     dueDate
-  };
-      //TODO: return error or no description or title
+    };  
+    newTodos[userId][id] = message;
 
-  todos[userId][id] = message;
-  return res.send(message);
 });
 app.put('/todos/:todoId',checkJwt, (req, res) => {
    //TODO: request latest version from api
@@ -150,9 +149,20 @@ app.put('/todos/:todoId',checkJwt, (req, res) => {
 app.delete('/todos/:todoId', checkJwt, (req, res) => {
   const userId = req.user.sub
   const todoId = req.params.todoId
-  const todo = todos[userId][todoId]
-  delete todos[userId][todoId]
-  return res.send(todo);
+  var todo = {}
+  getLatestData().then(function (response) {
+    console.log('response data', response.data);
+    var newData = response.data
+    todo = newData[userId][todoId]
+    delete newData[userId][todoId]
+    //TODO: put this data into new one
+    return   axios.put('https://api.jsonbin.io/b/5e396961f47af813bace8b68', newData, {  headers: {'secret-key': '$2b$10$ss6kyK17Nzbft.WFD/o.fe55Krc14gVmKOcXk6RxppiAURM7UZ75m'},
+  })
+  }).then(function(response){
+    return res.send(todo);
+  }).catch(function (error) {
+    console.log(error);
+  })
 });
 app.listen(process.env.PORT, () =>
   console.log(`Example app listening on port ${process.env.PORT}!`),
