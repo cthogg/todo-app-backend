@@ -77,7 +77,9 @@ app.get('/', checkJwt, (req, res) => {
 
 const binId = '5e396961f47af813bace8b68'
 const secretKey = '$2b$10$ss6kyK17Nzbft.WFD/o.fe55Krc14gVmKOcXk6RxppiAURM7UZ75m'
-
+//TODO: refactor all of the references to JS bin so it can be better handled
+//TODO: create a mock
+//TODO: add spinners to the application due to the slow load speeds. 
 const getLatestData = () =>  axios.get('https://api.jsonbin.io/e/5e396961f47af813bace8b68/versions',{  headers: {'secret-key': '$2b$10$ss6kyK17Nzbft.WFD/o.fe55Krc14gVmKOcXk6RxppiAURM7UZ75m'},
 }).then(function(response){
   const versionNumber = response.data.versionCount
@@ -88,7 +90,6 @@ app.get('/todos',checkJwt, (req, res) => {
  //TODO: request latest version from api
   const userId = req.user.sub
   getLatestData().then(function (response) {
-  console.log('response data', response.data);
   return res.send(Object.values(response.data[userId]));
 }).catch(function (error) {
   console.log(error);
@@ -112,8 +113,10 @@ app.post('/todos', checkJwt, (req, res) => {
    //TODO: request latest version from 
   //TODO: get from URL
   //TODO: PUT the URL with new 
-    const userId = req.user.sub
-    var newTodos = response.data
+
+
+  const userId = req.user.sub
+  const todoId = req.params.todoId
   const {description,title, dueDate, id} = req.body;
   const message = {
     id,
@@ -121,7 +124,20 @@ app.post('/todos', checkJwt, (req, res) => {
     title,
     dueDate
     };  
-    newTodos[userId][id] = message;
+  var todo = {}
+  getLatestData().then(function (response) {
+    console.log('response data', response.data);
+    var newTodos = response.data
+    newTodos[userId][id] = message;    
+    todo = newTodos[userId][todoId]
+    //TODO: put this data into new one
+    return   axios.put('https://api.jsonbin.io/b/5e396961f47af813bace8b68', newTodos, {  headers: {'secret-key': '$2b$10$ss6kyK17Nzbft.WFD/o.fe55Krc14gVmKOcXk6RxppiAURM7UZ75m'},
+  })
+  }).then(function(response){
+    return res.send(todo);
+  }).catch(function (error) {
+    console.log(error);
+  })
 
 });
 app.put('/todos/:todoId',checkJwt, (req, res) => {
@@ -151,7 +167,6 @@ app.delete('/todos/:todoId', checkJwt, (req, res) => {
   const todoId = req.params.todoId
   var todo = {}
   getLatestData().then(function (response) {
-    console.log('response data', response.data);
     var newData = response.data
     todo = newData[userId][todoId]
     delete newData[userId][todoId]
