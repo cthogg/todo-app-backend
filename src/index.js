@@ -14,6 +14,7 @@ app.use(express.urlencoded({ extended: true }));
 // Set up Auth0 configuration
 const authConfig = {
   //TODO: create new domain and audience
+  //TODO: set these as env variables
   domain: "dev-gzbfmeq4.eu.auth0.com",
   audience: "https://loggerman.com"
 };
@@ -36,7 +37,7 @@ const checkJwt = jwt({
 app.get('/', checkJwt, (req, res) => {
   res.send('Hello World!');
 });
-
+//TODO: set these as env variables
 const binId = '5e396961f47af813bace8b68'
 const binRouteExperimental = `https://api.jsonbin.io/e/${binId}`
 const binRouteBase = `https://api.jsonbin.io/b/${binId}`
