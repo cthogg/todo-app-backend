@@ -38,15 +38,14 @@ app.get('/', checkJwt, (req, res) => {
 });
 
 const binId = '5e396961f47af813bace8b68'
-const secretKey = '$2b$10$ss6kyK17Nzbft.WFD/o.fe55Krc14gVmKOcXk6RxppiAURM7UZ75m'
+const binRoute = `https://api.jsonbin.io/e/${binId}`
 //TODO: refactor all of the references to JS bin so it can be better handled
 //TODO: create a mock
 //TODO: add spinners to the application due to the slow load speeds. 
-const getLatestData = () =>  axios.get('https://api.jsonbin.io/e/5e396961f47af813bace8b68/versions',{  headers: {'secret-key': '$2b$10$ss6kyK17Nzbft.WFD/o.fe55Krc14gVmKOcXk6RxppiAURM7UZ75m'},
-}).then(function(response){
+const getLatestData = () =>  axios.get(`${binRoute}/versions`
+).then(function(response){
   const versionNumber = response.data.versionCount
- return  axios.get(`https://api.jsonbin.io/b/5e396961f47af813bace8b68/${versionNumber}`,{  headers: {'secret-key': '$2b$10$ss6kyK17Nzbft.WFD/o.fe55Krc14gVmKOcXk6RxppiAURM7UZ75m'},
-})})
+ return  axios.get(`https://api.jsonbin.io/b/5e396961f47af813bace8b68/${versionNumber}`)})
 
 app.get('/todos',checkJwt, (req, res) => {
  //TODO: request latest version from api
@@ -60,11 +59,6 @@ app.get('/todos',checkJwt, (req, res) => {
 
 //TODO: check for 201 
 app.post('/todos', checkJwt, (req, res) => {
-   //TODO: request latest version from 
-  //TODO: get from URL
-  //TODO: PUT the URL with new 
-
-
   const userId = req.user.sub
   const todoId = req.params.todoId
   const {description,title, dueDate, id} = req.body;
@@ -76,13 +70,11 @@ app.post('/todos', checkJwt, (req, res) => {
     };  
   var todo = {}
   getLatestData().then(function (response) {
-    console.log('response data', response.data);
     var newTodos = response.data
     newTodos[userId][id] = message;    
     todo = newTodos[userId][todoId]
     //TODO: put this data into new one
-    return   axios.put('https://api.jsonbin.io/b/5e396961f47af813bace8b68', newTodos, {  headers: {'secret-key': '$2b$10$ss6kyK17Nzbft.WFD/o.fe55Krc14gVmKOcXk6RxppiAURM7UZ75m'},
-  })
+    return   axios.put('https://api.jsonbin.io/b/5e396961f47af813bace8b68', newTodos)
   }).then(function(response){
     return res.send(todo);
   }).catch(function (error) {
@@ -109,8 +101,7 @@ app.put('/todos/:todoId',checkJwt, (req, res) => {
     var newTodos = response.data
     newTodos[userId][todoId] = message
     //TODO: put this data into new one
-    return   axios.put('https://api.jsonbin.io/b/5e396961f47af813bace8b68', newTodos, {  headers: {'secret-key': '$2b$10$ss6kyK17Nzbft.WFD/o.fe55Krc14gVmKOcXk6RxppiAURM7UZ75m'},
-  })
+    return   axios.put('https://api.jsonbin.io/b/5e396961f47af813bace8b68', newTodos)
   }).then(function(response){
     return res.send(
       message
@@ -133,8 +124,7 @@ app.delete('/todos/:todoId', checkJwt, (req, res) => {
     todo = newData[userId][todoId]
     delete newData[userId][todoId]
     //TODO: put this data into new one
-    return   axios.put('https://api.jsonbin.io/b/5e396961f47af813bace8b68', newData, {  headers: {'secret-key': '$2b$10$ss6kyK17Nzbft.WFD/o.fe55Krc14gVmKOcXk6RxppiAURM7UZ75m'},
-  })
+    return   axios.put('https://api.jsonbin.io/b/5e396961f47af813bace8b68', newData)
   }).then(function(response){
     return res.send(todo);
   }).catch(function (error) {
