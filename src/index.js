@@ -51,7 +51,13 @@ const getLatestData = () =>  axios.get(`${binRouteExperimental}/versions`
 app.get('/todos',checkJwt, (req, res) => {
   const userId = req.user.sub
   getLatestData().then(function (response) {
-  return res.send(Object.values(response.data[userId]));
+  console.log('response.data', response.data);
+  if (Object.prototype.hasOwnProperty.call(response.data, userId)) {
+    return res.send(Object.values(response.data[userId]));
+  } else{
+    res.send('no todos');
+  }
+  
 }).catch(function (error) {
   console.log(error);
 })  
@@ -71,7 +77,13 @@ app.post('/todos', checkJwt, (req, res) => {
   var todo = {}
   getLatestData().then(function (response) {
     var newTodos = response.data
-    newTodos[userId][id] = message;    
+    if(!Object.prototype.hasOwnProperty.call(newTodos, userId)){
+      newTodos[userId] ={}
+      newTodos[userId][id] = message;
+    };
+    if(Object.prototype.hasOwnProperty.call(newTodos, userId)){
+      newTodos[userId][id] = message;
+    };
     todo = newTodos[userId][todoId]
     return   axios.put(binRouteBase, newTodos)
   }).then(function(response){
